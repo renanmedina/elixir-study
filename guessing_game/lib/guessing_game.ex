@@ -1,11 +1,12 @@
 defmodule GuessingGame do
   import IO
 
-  @guesses_for_difficulty [
-    easy: 25,
-    medium: 15,
-    hard: 8
-  ]
+  @guesses_for_difficulty %{
+    # [guesses, max_target_value]
+    :easy => [25, 100],
+    :medium => [15, 1000],
+    :hard => [8, 10_000]
+  }
 
   defp request_guess() do
     {user_input, _} = IO.gets("Your guess: ") |> Integer.parse
@@ -40,9 +41,9 @@ defmodule GuessingGame do
 
   defp set_difficulty(difficulty) do
     case difficulty do
-      1 -> @guesses_for_difficulty[:easy]
-      2 -> @guesses_for_difficulty[:medium]
-      3 -> @guesses_for_difficulty[:hard]
+      op when op in[1, :easy] -> @guesses_for_difficulty.easy
+      op when op in[2, :medium] -> @guesses_for_difficulty.medium
+      op when op in[3, :hard] -> @guesses_for_difficulty.hard
     end
   end
 
@@ -67,28 +68,33 @@ defmodule GuessingGame do
     "You have #{guesses} guesses available" |> puts
   end
 
-  defp play_game(guesses_available, answer) do
-    print_remaining_guesses(guesses_available)
-    user_guess = request_guess()
+  def take_guess(user_guess, answer, guesses_available) do
     case check_guess(user_guess, answer) do
       :ok ->
-        String.duplicate("-", 100) |> puts
-        "🎉🎉🎉 Congratulations!!!! You found the target number: #{answer} 🎉🎉🎉" |> puts
-        String.duplicate("-", 100) |> puts
+        msg = String.duplicate("-", 100) <> "\r\n🎉🎉🎉 Congratulations!!!! You found the target number: #{answer} 🎉🎉🎉\r\n" <> String.duplicate("-", 100)
+        [:ok, msg]
       [:error, message] ->
-        message |> puts
-        guesses_available = guesses_available - 1
-        if guesses_available > 0 do
-          play_game(guesses_available, answer)
+        case guesses_available - 1 do
+          guesses when guesses > 0 -> [:continue, guesses]
+          _ ->
+            msg = String.duplicate("-", 100) <> "⚠ Ops!!!! You don't have any more guesses available ⚠"
+            [:guesses_unavailable, msg]
         end
     end
   end
 
+  defp play_game(guesses_available, answer) do
+    print_remaining_guesses(guesses_available)
+    user_guess = request_guess()
+    case take_guess(user_guess, answer, guesses_available) do
+      [:continue, guesses_left] -> play_game(guesses_left, answer)
+      [_, message] -> message |> puts
+    end
+  end
+
   def run() do
-    range_max = 10_000
-    answer = :rand.uniform(range_max)
     print_header()
-    guesses_available = request_and_apply_difficulty()
-    play_game(guesses_available, answer)
+    [guesses_available, target_number] = request_and_apply_difficulty()
+    play_game(guesses_available, target_number)
   end
 end
