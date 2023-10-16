@@ -3,7 +3,9 @@ on: [push]
 jobs:
   GuessingGameTests:
     runs-on: ubuntu-latest
-    working-directory: ${{ github.workspace }}/guessing_game
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}/guessing_game
     steps:
       - uses: actions/checkout@v2
       - name: Set up Elixir
