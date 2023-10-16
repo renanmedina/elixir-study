@@ -32,7 +32,6 @@ defmodule GuessingGame do
       difficulty when difficulty in [1, 2, 3] ->
         set_difficulty(difficulty)
       _ ->
-        difficulty_option = 0
         String.duplicate("-", 100) |> puts
         "ERROR: difficulty not available, choose between the available ones (1 - Easy, 2 - Medium, 3 - Hard)" |> puts
         request_and_apply_difficulty()
