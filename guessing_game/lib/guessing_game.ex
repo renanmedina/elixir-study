@@ -1,4 +1,4 @@
-defmodule GuessTheNumberGame do
+defmodule GuessingGame do
   import IO
 
   @guesses_for_difficulty [
@@ -53,7 +53,7 @@ defmodule GuessTheNumberGame do
     String.duplicate("#", 100) |> puts
   end
 
-  defp check_guess(user_guess, answer) do
+  def check_guess(user_guess, answer) do
     case user_guess do
       guess when answer > guess  ->
         [:error, "The target number is bigger than #{guess}"]
@@ -68,7 +68,7 @@ defmodule GuessTheNumberGame do
     "You have #{guesses} guesses available" |> puts
   end
 
-  defp game_loop(guesses_available, answer) do
+  defp play_game(guesses_available, answer) do
     print_remaining_guesses(guesses_available)
     user_guess = request_guess()
     case check_guess(user_guess, answer) do
@@ -80,7 +80,7 @@ defmodule GuessTheNumberGame do
         message |> puts
         guesses_available = guesses_available - 1
         if guesses_available > 0 do
-          game_loop(guesses_available, answer)
+          play_game(guesses_available, answer)
         end
     end
   end
@@ -88,11 +88,8 @@ defmodule GuessTheNumberGame do
   def run() do
     range_max = 10_000
     answer = :rand.uniform(range_max)
-    "Target number: #{answer}" |> puts
     print_header()
     guesses_available = request_and_apply_difficulty()
-    game_loop(guesses_available, answer)
+    play_game(guesses_available, answer)
   end
 end
-
-GuessTheNumberGame.run()
