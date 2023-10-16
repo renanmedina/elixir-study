@@ -8,6 +8,8 @@ jobs:
         working-directory: ${{ github.workspace }}/guessing_game
     steps:
       - uses: actions/checkout@v2
+      - name: Update Repositories && Install libs
+        run: apt-get update && apt install libncurses5
       - name: Set up Elixir
         uses: actions/setup-elixir@v1
         with:
