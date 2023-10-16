@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Update Repositories && Install libs
-        run: apt-get update && apt install libncurses5
+        run: sudo apt-get update && sudo apt install libncurses5
       - name: Set up Elixir
         uses: actions/setup-elixir@v1
         with:
